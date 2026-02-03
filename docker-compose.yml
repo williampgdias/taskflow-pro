@@ -1,7 +1,22 @@
 version: '3.8'
 
 services:
-    # Backend: Laravel API
+    # Banco de Dados
+    database:
+        image: mysql:8.0
+        container_name: taskflow_db
+        restart: always
+        environment:
+            MYSQL_DATABASE: taskflow_db
+            MYSQL_ROOT_PASSWORD: root
+        ports:
+            - '3306:3306'
+        networks:
+            - taskflow_network
+        volumes:
+            - db-data:/var/lib/mysql
+
+    # Backend (Laravel)
     backend:
         build:
             context: ./backend
@@ -11,37 +26,32 @@ services:
         working_dir: /var/www
         volumes:
             - ./backend:/var/www
+        depends_on:
+            - database
+        ports:
+            - '8000:8000'
         networks:
             - taskflow_network
 
-    # Frontend: Next.js
+    # Frontend (Next.js)
     frontend:
         build:
             context: ./frontend
             dockerfile: Dockerfile
         container_name: taskflow_client
-        restart: unless-stopped
+        restart: always
         ports:
             - '3000:3000'
         volumes:
             - ./frontend:/app
-            - /app/node_modules
         networks:
             - taskflow_network
-
-    # Database: MySQL
-    database:
-        image: mysql:8.0
-        container_name: taskflow_db
-        restart: unless-stopped
-        environment:
-            MYSQL_DATABASE: ${DB_DATABASE}
-            MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
-        ports:
-            - '3306:3306'
-        networks:
-            - taskflow_network
+        stdin_open: true
+        tty: true
 
 networks:
     taskflow_network:
         driver: bridge
+
+volumes:
+    db-data:
