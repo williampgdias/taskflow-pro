@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Task;
+use App\Models\User;
 use Illuminate\Database\Seeder;
 
 class TaskSeeder extends Seeder
@@ -12,24 +13,23 @@ class TaskSeeder extends Seeder
      */
     public function run(): void
     {
-        Task::truncate();
 
-        Task::create([
-            'title' => 'Complete Docker Infrastructure setup',
-            'description' => 'Ensure backend and database container are running and communicating properly.',
-            'status' => 'done'
-        ]);
+        $user = User::first();
 
-        Task::create([
-            'title' => 'Configure API endpoints',
-            'description' => 'Setup routes/api.php to handle task listing and management.',
-            'status' => 'in_progress'
-        ]);
+        if ($user) {
+            Task::create([
+                'user_id'     => $user->id,
+                'title'       => 'Complete Docker Infrastructure setup',
+                'description' => 'Ensure backend and database containers are stable.',
+                'status'      => 'done'
+            ]);
 
-        Task::create([
-            'title' => 'Integrate Next.js frontend',
-            'description' => 'Connect the client application with the Laravel API.',
-            'status' => 'todo'
-        ]);
+            Task::create([
+                'user_id'     => $user->id,
+                'title'       => 'Configure API authentication',
+                'description' => 'Implement Laravel Sanctum for secure access.',
+                'status'      => 'in_progress'
+            ]);
+        }
     }
 }

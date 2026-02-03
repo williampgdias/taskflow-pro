@@ -14,9 +14,13 @@ class Task extends Model
      *
      * @var array<int, string>
      */
-    protected $fillable = [
-        'title',
-        'description',
-        'status',
-    ];
+    protected $fillable = ['title', 'description', 'status', 'user_id'];
+
+    /**
+     * Get the user that owns the task
+     */
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }
