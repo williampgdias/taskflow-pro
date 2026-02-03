@@ -1,8 +1,12 @@
 <?php
 
 use App\Http\Controllers\TaskController;
+use App\Http\Controllers\AuthController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/tasks', [TaskController::class, 'index']);
+Route::post('/login', [AuthController::class, 'login']);
 
-Route::post('/tasks', [TaskController::class, 'store']);
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/tasks', [TaskController::class, 'index']);
+    Route::post('/tasks', [TaskController::class, 'store']);
+});
