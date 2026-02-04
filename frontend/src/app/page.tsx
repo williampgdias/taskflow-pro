@@ -1,14 +1,35 @@
 'use client';
 
+import api from '@/lib/api';
+import Cookies from 'js-cookie';
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 export default function LoginPage() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
+    const router = useRouter();
+    const [error, setError] = useState('');
+
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
-        console.log('Attempting login with:', { email, password });
+        setError(''); // Clear previous errors
+
+        try {
+            const response = await api.post('/login', { email, password });
+
+            const { access_token } = response.data;
+
+            // Save the token in a cookie (expires in 7 days)
+            Cookies.set('token', access_token, { expires: 7, secure: true });
+
+            console.log('Login successful! Redirecting...');
+            // router.push('/dashboard');
+        } catch (err: any) {
+            setError('Invalid credentials. Please try again.');
+            console.error('Login error:', err.response?.data);
+        }
     };
 
     return (
@@ -52,6 +73,11 @@ export default function LoginPage() {
                             />
                         </div>
                     </div>
+                    {error && (
+                        <div className="text-sm text-red-600 bg-red-50 p-2 rounded border border-red-200 text-center">
+                            {error}
+                        </div>
+                    )}
 
                     <button
                         type="submit"
