@@ -1,5 +1,16 @@
 FROM node:20-alpine
+
 WORKDIR /app
-RUN apk add --no-cache libc6-compat
-# Por enquanto, como não instalamos o Next.js ainda, vamos deixar em standby
-CMD ["sh"]
+
+# Copy package files first for better caching
+COPY package*.json ./
+
+RUN npm install
+
+# Copy the rest of the code
+COPY . .
+
+# Next.js development port
+EXPOSE 3000
+
+CMD ["npm", "run", "dev"]

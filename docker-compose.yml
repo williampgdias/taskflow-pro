@@ -1,7 +1,7 @@
 version: '3.8'
 
 services:
-    # Banco de Dados
+    # Database
     database:
         image: mysql:8.0
         container_name: taskflow_db
@@ -10,14 +10,14 @@ services:
             MYSQL_DATABASE: taskflow_db
             MYSQL_ROOT_PASSWORD: root
         ports:
-            - '3306:3306'
+            - '3307:3306'
         networks:
             - taskflow_network
         volumes:
             - db-data:/var/lib/mysql
 
     # Backend (Laravel)
-    backend:
+    taskflow_api:
         build:
             context: ./backend
             dockerfile: Dockerfile
@@ -34,7 +34,7 @@ services:
             - taskflow_network
 
     # Frontend (Next.js)
-    frontend:
+    taskflow_client:
         build:
             context: ./frontend
             dockerfile: Dockerfile
@@ -44,6 +44,11 @@ services:
             - '3000:3000'
         volumes:
             - ./frontend:/app
+            - /app/node_modules
+        environment:
+            - NEXT_PUBLIC_API_URL=http://localhost:8000/api
+        depends_on:
+            - taskflow_api
         networks:
             - taskflow_network
         stdin_open: true
