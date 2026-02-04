@@ -2,15 +2,20 @@
 
 import api from '@/lib/api';
 import Cookies from 'js-cookie';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 export default function LoginPage() {
+    const [mounted, setMounted] = useState(false);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-
-    const router = useRouter();
     const [error, setError] = useState('');
+    const router = useRouter();
+
+    useEffect(() => {
+        const timeout = setTimeout(() => setMounted(true), 0);
+        return () => clearTimeout(timeout);
+    }, []);
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -18,22 +23,37 @@ export default function LoginPage() {
 
         try {
             const response = await api.post('/login', { email, password });
-
             const { access_token } = response.data;
 
             // Save the token in a cookie (expires in 7 days)
             Cookies.set('token', access_token, { expires: 7, secure: true });
-
             console.log('Login successful! Redirecting...');
-            // router.push('/dashboard');
-        } catch (err: any) {
+            router.push('/dashboard');
+        } catch (err: unknown) {
+            // Criamos um tipo local para o erro para satisfazer o fiscal (Linter)
+            interface AxiosErrorResponse {
+                response?: {
+                    data?: unknown;
+                };
+            }
+
+            const axiosError = err as AxiosErrorResponse;
+
+            if (axiosError.response?.data) {
+                console.error('Login error:', axiosError.response.data);
+            }
+
             setError('Invalid credentials. Please try again.');
-            console.error('Login error:', err.response?.data);
         }
     };
 
+    if (!mounted) return null;
+
     return (
-        <main className="flex min-h-screen items-center justify-center bg-gray-100 p-4">
+        <main
+            suppressHydrationWarning={true}
+            className="flex min-h-screen items-center justify-center bg-gray-100 p-4"
+        >
             <div className="w-full max-w-md space-y-8 rounded-xl bg-white p-10 shadow-lg">
                 <div className="text-center">
                     <h1 className="text-3xl font-bold text-gray-900">
