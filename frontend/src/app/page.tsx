@@ -30,7 +30,6 @@ export default function LoginPage() {
             console.log('Login successful! Redirecting...');
             router.push('/dashboard');
         } catch (err: unknown) {
-            // Criamos um tipo local para o erro para satisfazer o fiscal (Linter)
             interface AxiosErrorResponse {
                 response?: {
                     data?: unknown;
