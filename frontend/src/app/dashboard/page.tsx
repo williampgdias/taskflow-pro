@@ -23,12 +23,11 @@ export default function DashboardPage() {
             const token = Cookies.get('token');
 
             if (!token) {
-                router.push('/'); // Sem token? Volta pro login!
+                router.push('/');
                 return;
             }
 
             try {
-                // Enviamos o token no Header de Autorização
                 const response = await api.get('/tasks', {
                     headers: {
                         Authorization: `Bearer ${token}`,
@@ -37,7 +36,6 @@ export default function DashboardPage() {
                 setTasks(response.data.data);
             } catch (error) {
                 console.error('Failed to fetch tasks:', error);
-                // Se o token for inválido/expirado, limpa e desloga
                 Cookies.remove('token');
                 router.push('/');
             } finally {
