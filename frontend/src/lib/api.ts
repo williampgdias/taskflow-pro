@@ -1,8 +1,7 @@
-import axios from 'axios';
+import axios, { AxiosInstance } from 'axios';
 
-// Create an axios instance with base configuration
-const api = axios.create({
-    baseURL: process.env.NEXT_PUBLIC_API_URL,
+const api: AxiosInstance = axios.create({
+    baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api',
     headers: {
         'Content-Type': 'application/json',
         Accept: 'application/json',
